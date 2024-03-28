@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>شركة المضحكين المحدوده</title>
+   
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+      #map {
+        height: 600px;
+      }
+      
+       /* #map > div.leaflet-control-container > div.leaflet-top.leaflet-right{
+        display: none;
+      }  */
+      #map > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path:nth-child(10){
+        color: blue;
+      }
+      #map > div.leaflet-control-container > div.leaflet-bottom.leaflet-right{
+        display: none;
+      }
+      #map > div.leaflet-control-container > div.leaflet-top.leaflet-right > div:nth-child(1){
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script>
+      var map = L.map("map").setView([0, 0], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      map.locate({ setView: true, maxZoom: 16 });
+
+      function createMarker(latlng, label) {
+        return L.marker(latlng).bindPopup(label).addTo(map);
+      }
+
+      var userMarker;
+      map.on("locationfound", function (e) {
+        var userLatLng = e.latlng;
+        userMarker = createMarker(userLatLng, "Your location");
+        findNearestPoint(userLatLng);
+      });
+
+      var pointsOfInterest = [
+        { latlng: L.latLng(29.92025648, 31.66153976) },
+        { latlng: L.latLng(29.91984662, 31.65582736) },
+        { latlng: L.latLng(29.92140281, 31.64310305) },
+        { latlng: L.latLng(29.91924688, 31.65252834) },
+        { latlng: L.latLng(29.92036159, 31.64824746) },
+        { latlng: L.latLng(29.92391053, 31.64047135) },
+        { latlng: L.latLng(29.92080031, 31.63635678) },
+        { latlng: L.latLng(29.9225627, 31.6374593) },
+        { latlng: L.latLng(29.92802858, 31.63569921) },
+        { latlng: L.latLng(29.92723283, 31.64247581) },
+        { latlng: L.latLng(29.92762753, 31.64360205) },
+        { latlng: L.latLng(29.93353591, 31.63308109) },
+        { latlng: L.latLng(29.93189108, 31.63418453) },
+        { latlng: L.latLng(29.94182195, 31.63362303) },
+      ];
+
+      var pointMarkers = [];
+      for (var i = 0; i < pointsOfInterest.length; i++) {
+        var point = pointsOfInterest[i];
+        pointMarkers.push(createMarker(point.latlng, point.label));
+      }
+
+      function findNearestPoint(userLatLng) {
+        var nearestPoint = pointMarkers[0];
+        var nearestDistance = userLatLng.distanceTo(nearestPoint.getLatLng());
+
+        for (var i = 1; i < pointMarkers.length; i++) {
+          var point = pointMarkers[i];
+          var distance = userLatLng.distanceTo(point.getLatLng());
+
+          if (distance < nearestDistance) {
+            nearestPoint = point;
+            nearestDistance = distance;
+          }
+        }
+
+        var routingControl = L.Routing.control({
+          waypoints: [userLatLng, nearestPoint.getLatLng()],
+          routeWhileDragging: true,
+        }).addTo(map);
+      }
+    </script>
+       <script>
+       
+        function moveMarker(marker, coordinates) {
+          var index = 0;
+          var moveInterval = setInterval(function () {
+            if (index === coordinates.length) {
+              clearInterval(moveInterval);
+            } else {
+              marker.setLatLng([coordinates[index].lat, coordinates[index].lng]);
+              index++;
+            }
+          }, 500);
+        }
+        var routes = [
+        //   [30.04143225, 31.63175846],
+        //   [30.02103178, 31.63502684],
+          // [30.0409938, 31.66149755],
+          // [30.02465371, 31.66306636],
+          // [30.04110352, 31.70216609],
+          // [30.01969939, 31.69739005],
+          // [30.00971809, 31.59139044],
+          // [30.00300955, 31.60254829],
+          // [30.00683854, 31.63299069],
+          // [29.99425851, 31.65895322],
+          // [29.98352261, 31.71919862],
+          // [29.95166325, 31.71728543],
+          [29.97214007, 31.59486114],
+          // [29.95955484, 31.61241278],
+          // [29.93628197, 31.58379495],
+          // [29.9314317, 31.6019846],
+          // [29.94115004, 31.60325853],
+          // [29.92898995, 31.61050283],
+          // [29.95638093, 31.63033123],
+          // [29.93392192, 31.65966619],
+        //   [29.948876, 31.624521],
+          [29.920906, 31.636246],
+        ];
+  
+        var markerIcon = L.icon({
+          iconUrl: "bus.jpeg",
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32],
+        });
+        for (var i = 0; i < routes.length; i += 2) {
+          var startPoint = routes[i];
+          var endPoint = routes[i + 1];
+  
+          var circle = L.circle(startPoint, {
+            color: "blue",
+            fillColor: "yellow",
+            fillOpacity: 0.5,
+            radius: 15,
+          }).addTo(map);
+  
+          var circle = L.circle(endPoint, {
+            color: "blue",
+            fillColor: "yellow",
+            fillOpacity: 0.5,
+            radius: 15,
+          }).addTo(map);
+  
+          var marker = L.marker(startPoint, { icon: markerIcon }).addTo(map);
+          L.Routing.control({
+            waypoints: [L.latLng(startPoint), L.latLng(endPoint)],
+          })
+            .on("routesfound", function (e) {
+              var coordinates = e.routes[0].coordinates;
+              moveMarker(marker, coordinates);
+            })
+            .addTo(map);
+        }
+      </script>
+  </body>
+</html>
